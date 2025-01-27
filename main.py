@@ -6,13 +6,7 @@ import os
 from dotenv import load_dotenv
 from typing import List, Dict
 from fastapi.middleware.cors import CORSMiddleware
-
-# Load environment variables
-load_dotenv(".env")
-Gemini_API_KEY = os.getenv("GEMINI_API_KEY")
-
-# Configure Gemini API
-genai.configure(api_key=Gemini_API_KEY)
+from fastapi.responses import FileResponse
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -21,12 +15,19 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Add CORS middleware
+# Load environment variables
+load_dotenv(".env")
+Gemini_API_KEY = os.getenv("GEMINI_API_KEY")
+
+# Configure Gemini API
+genai.configure(api_key=Gemini_API_KEY)
+
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this in production
+    allow_origins=["*"],  # Temporarily allow all origins
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["POST", "GET", "OPTIONS"],  # Ensure POST and OPTIONS are allowed
     allow_headers=["*"],
 )
 
@@ -48,7 +49,6 @@ def get_similar_contexts(question: str):
     """Retrieve similar contexts from the vector store."""
     try:
         results = vector_store.similarity_search_with_score(question, k=2)
-        # Convert Documents to dictionary format
         contexts = [
             {
                 "content": doc.page_content,
@@ -66,7 +66,7 @@ def get_similar_contexts(question: str):
 
 def generate_prompt(question: str, contexts: List[Dict]) -> str:
     """Generate the prompt for the LLM."""
-    return """You are a professional e-commerce customer service chatbot. Your role is to assist customers with their queries in a friendly and helpful manner.
+    return f"""You are a professional e-commerce customer service chatbot. Your role is to assist customers with their queries in a friendly and helpful manner.
 
 Instructions:
 1. Always start with a polite greeting
@@ -79,47 +79,30 @@ User Question: {question}
 
 Relevant FAQ Information: {contexts}
 
-Please respond in a helpful and professional manner.""".format(
-        question=question, contexts=contexts
-    )
+Please respond in a helpful and professional manner."""
 
 
+# Serve index.html at the root ("/")
 @app.get("/")
-async def root():
-    """Root endpoint to verify API is running."""
-    return {"message": "E-commerce Chatbot API is running"}
+async def serve_frontend():
+    return FileResponse("index.html")
 
 
+# API endpoint for chatbot
 @app.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
-    """
-    Chat endpoint that processes user questions and returns responses.
-
-    Args:
-        request (ChatRequest): The chat request containing the user's question
-
-    Returns:
-        ChatResponse: The chatbot's response and relevant contexts
-    """
     try:
-        # Get similar contexts
         contexts = get_similar_contexts(request.question)
-
-        # Generate prompt
         prompt = generate_prompt(request.question, contexts)
-
-        # Get response from LLM
         response = chat.send_message(prompt)
-
         return ChatResponse(response=response.text, context=contexts)
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Health check endpoint
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
     return {"status": "healthy"}
 
 
