@@ -2,6 +2,10 @@
 
 A smart chatbot system designed for e-commerce platforms that leverages Retrieval-Augmented Generation (RAG) to provide accurate and contextual responses to customer queries. The system combines a comprehensive FAQ database with Google's Gemini AI to deliver professional and friendly customer service.
 
+## Demo
+
+[Watch the demo video](https://drive.google.com/file/d/1Luuzoqv2oeh9iGLXlfcCzsXpUWGdnR7o/view?usp=drive_link)
+
 ## Features
 
 - RAG-based information retrieval using Chroma vector store
