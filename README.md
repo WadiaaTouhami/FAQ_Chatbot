@@ -2,9 +2,11 @@
 
 A smart chatbot system designed for e-commerce platforms that leverages Retrieval-Augmented Generation (RAG) to provide accurate and contextual responses to customer queries. The system combines a comprehensive FAQ database with Google's Gemini AI to deliver professional and friendly customer service.
 
-## Demo
+## 🎬 Demo Video
 
-[Watch the demo video](https://drive.google.com/file/d/1Luuzoqv2oeh9iGLXlfcCzsXpUWGdnR7o/view?usp=drive_link)
+**Watch the app in action!** 
+
+[![Demo Video](https://img.shields.io/badge/🎥_Watch_Demo-Google_Drive-blue?style=for-the-badge)](https://drive.google.com/file/d/1Luuzoqv2oeh9iGLXlfcCzsXpUWGdnR7o/view?usp=drive_link)
 
 ## Features
 
